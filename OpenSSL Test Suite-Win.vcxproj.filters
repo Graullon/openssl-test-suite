@@ -21,7 +21,7 @@
     <ClCompile Include="src\EVPCipherContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\EVPOutputBuffer.cpp">
+    <ClCompile Include="src\EVPBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Benchmark.cpp">
@@ -35,7 +35,7 @@
     <ClInclude Include="src\EVPCipherContext.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\EVPOutputBuffer.h">
+    <ClInclude Include="src\EVPBuffer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Benchmark.h">

@@ -22,14 +22,14 @@
     <ClCompile Include="src\Benchmark.cpp" />
     <ClCompile Include="src\EVPCipher.cpp" />
     <ClCompile Include="src\EVPCipherContext.cpp" />
-    <ClCompile Include="src\EVPOutputBuffer.cpp" />
+    <ClCompile Include="src\EVPBuffer.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Benchmark.h" />
     <ClInclude Include="src\EVPCipher.h" />
     <ClInclude Include="src\EVPCipherContext.h" />
-    <ClInclude Include="src\EVPOutputBuffer.h" />
+    <ClInclude Include="src\EVPBuffer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
