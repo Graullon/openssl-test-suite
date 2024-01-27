@@ -23,9 +23,9 @@ Benchmark::~Benchmark() {
 void Benchmark::save() {
 
 	const uint64_t cpu_cycles = __rdtsc();
-	const std::chrono::nanoseconds ms = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+	const std::chrono::high_resolution_clock::time_point time_point = std::chrono::high_resolution_clock::now();
 
-	m_points.push_back({ms, cpu_cycles });
+	m_points.push_back({ time_point, cpu_cycles });
 
 	#ifndef BENCHMARK_MODE
 	std::cout << "----------------------------------";
@@ -40,18 +40,26 @@ void Benchmark::print() const {
 
 	for (size_t i = 1; i < m_points.size(); ++i) {
 
-		const std::pair<std::chrono::nanoseconds, uint64_t>& previous = m_points[i - 1];
-		const std::pair<std::chrono::nanoseconds, uint64_t>& next = m_points[i];
+		const std::pair<std::chrono::steady_clock::time_point, uint64_t>& previous = m_points[i - 1];
+		const std::pair<std::chrono::steady_clock::time_point, uint64_t>& next = m_points[i];
 
-		const std::pair<std::chrono::nanoseconds, uint64_t> difference({ next.first - previous.first, next.second - previous.second });
+		#define TIME_RESOLUTION_1H std::chrono::hours(1)
+		#define TIME_RESOLUTION_DESIRED std::chrono::microseconds
 
-		const double max_cpu_cycles_per_time_diff = cpu_frequency_hz * difference.first.count() / 1000000000.0;
-		const double max_tdp_per_time_diff = cpu_tdp * difference.first.count() / 1000000000.0;
+		const std::pair<TIME_RESOLUTION_DESIRED, uint64_t> difference({
+			std::chrono::duration_cast<TIME_RESOLUTION_DESIRED>(next.first.time_since_epoch()) - std::chrono::duration_cast<TIME_RESOLUTION_DESIRED>(previous.first.time_since_epoch()),
+			next.second - previous.second
+			});
+
+		const TIME_RESOLUTION_DESIRED time_resolution_in_time_resolution_desired = std::chrono::duration_cast<TIME_RESOLUTION_DESIRED>(TIME_RESOLUTION_1H);
 
 		std::cout
 			<< "\nBenchmark point #" << i
+			<< "\nDuration (microseconds): " << difference.first.count()
 			<< "\nCPU cycles burnt: " << difference.second
-			<< "\nPower consumption (watts per hour): " << difference.second * max_tdp_per_time_diff / max_cpu_cycles_per_time_diff 
+			<< "\nPower consumption (nanowatts/duration): " << (cpu_tdp * difference.first / time_resolution_in_time_resolution_desired) * 1000000000
 			<< std::endl;
+
+		//std::cout << difference.first.count() << ';' << difference.second << ';' << (cpu_tdp * difference.first / time_resolution_in_time_resolution_desired) * 1000000000 << '\n';
 	}
 }
