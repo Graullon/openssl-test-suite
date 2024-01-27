@@ -7,10 +7,11 @@
 class Benchmark {
 
 	private:
-		std::vector< std::pair<std::chrono::milliseconds, uint64_t> > m_points;
+		std::vector< std::pair<std::chrono::nanoseconds, uint64_t> > m_points;
 
 	public:
 		Benchmark();
+		~Benchmark();
 
 		void save();
 		void print() const;

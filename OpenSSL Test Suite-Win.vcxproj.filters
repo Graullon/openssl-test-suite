@@ -30,6 +30,12 @@
     <ClCompile Include="src\EVPCipher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ECSecretContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\X509Certificate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EVPCipherContext.h">
@@ -42,6 +48,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\EVPCipher.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ECSecretContext.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\X509Certificate.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
