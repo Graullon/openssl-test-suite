@@ -1,5 +1,6 @@
 ﻿#include "X509Certificate.h"
 
+#include "EVPBuffer.h"
 #include "Benchmark.h"
 
 #include <iostream>
@@ -76,6 +77,39 @@ bool X509Certificate::verify(const X509Certificate& certificate) {
 	return X509_verify(m_certificate, certificate.pkey()) == 1;
 }
 
+EVPBuffer* X509Certificate::derive(const X509Certificate& certificate) {
+
+	EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(m_pkey, NULL);
+	if (ctx == NULL) {
+		return nullptr;
+	}
+
+	if (EVP_PKEY_derive_init(ctx) != 1) {
+		return nullptr;
+	}
+
+	if (EVP_PKEY_derive_set_peer(ctx, certificate.pkey()) != 1) {
+		return nullptr;
+	}
+
+	size_t secret_key_size = 0;
+	if (EVP_PKEY_derive(ctx, NULL, &secret_key_size) != 1) {
+		return nullptr;
+	}
+
+	unsigned char* secret_key_buffer = new unsigned char[secret_key_size];
+	memset(secret_key_buffer, 0, secret_key_size);
+
+	if (EVP_PKEY_derive(ctx, secret_key_buffer, &secret_key_size) != 1) {
+		return nullptr;
+	}
+
+	EVPBuffer* secret_key = new EVPBuffer(secret_key_buffer, secret_key_size);
+	delete[] secret_key_buffer;
+
+	return secret_key;
+}
+
 void X509Certificate::print() {
 
 	if (!m_certificate) {
@@ -126,12 +160,12 @@ void X509Certificate::test_x509_certificate() {
 	Benchmark benchmark;
 	benchmark.save();
 
-	X509Certificate caSignedCertificate(X509Certificate::KeyType::RSA);
+	X509Certificate caSignedCertificate(X509Certificate::KeyType::EC);
 	caSignedCertificate.sign();
 
 	benchmark.save();
 
-	X509Certificate csrCertificate(X509Certificate::KeyType::RSA);
+	X509Certificate csrCertificate(X509Certificate::KeyType::EC);
 	csrCertificate.sign(caSignedCertificate);
 
 	benchmark.save();
@@ -144,7 +178,22 @@ void X509Certificate::test_x509_certificate() {
 
 	benchmark.print();
 
-	/* Uncomment if want to check third-party certificate sign
+	EVPBuffer* caCertificateSecretKey = caSignedCertificate.derive(csrCertificate);
+	EVPBuffer* csrCertificateSecretKey = csrCertificate.derive(caSignedCertificate);
+
+	#ifndef BENCHMARK_MODE
+	const std::string_view ca_certificate_secret_key_string_view((const char*)caCertificateSecretKey->data(), caCertificateSecretKey->size());
+	const std::string_view csr_certificate_secret_key_string_view((const char*)csrCertificateSecretKey->data(), csrCertificateSecretKey->size());
+
+	std::cout
+		<< "\nCA&CSR certificate secret key equals CSR&CA certificate secret key: " << (ca_certificate_secret_key_string_view.compare(csr_certificate_secret_key_string_view) == 0 ? "true" : "false")
+		<< std::endl;
+	#endif
+
+	delete caCertificateSecretKey;
+	delete csrCertificateSecretKey;
+
+	// Uncomment if want to check third-party certificate sign
 	#ifndef BENCHMARK_MODE
 	X509Certificate thirdPartyCertificate(X509Certificate::KeyType::EC);
 	thirdPartyCertificate.sign();
@@ -152,6 +201,15 @@ void X509Certificate::test_x509_certificate() {
 	std::cout
 		<< "\nCSR Certificate signed by CA Certificate: " << ((csrCertificate.verify(caSignedCertificate) == true) ? "true" : "false")
 		<< std::endl;
+
+	EVPBuffer* thirdPartyCertificateSecretKey = caSignedCertificate.derive(thirdPartyCertificate);
+
+	const std::string_view third_party_certificate_secret_key_string_view((const char*)thirdPartyCertificateSecretKey->data(), thirdPartyCertificateSecretKey->size());
+
+	std::cout
+		<< "\nCA&ThirdParty certificate secret key equals CA&CSR certificate secret key: " << (ca_certificate_secret_key_string_view.compare(third_party_certificate_secret_key_string_view) == 0 ? "true" : "false")
+		<< std::endl;
+	
+	delete thirdPartyCertificateSecretKey;
 	#endif
-	*/
 }

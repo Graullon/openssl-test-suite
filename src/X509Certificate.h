@@ -3,6 +3,8 @@
 #include "openssl/evp.h"
 #include "openssl/x509.h"
 
+class EVPBuffer;
+
 class X509Certificate {
 
 	public:
@@ -23,6 +25,8 @@ class X509Certificate {
 		void sign(const X509Certificate&);
 
 		bool verify(const X509Certificate&);
+		EVPBuffer* derive(const X509Certificate&);
+
 		void print();
 
 		static void test_x509_certificate();

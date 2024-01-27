@@ -24,7 +24,6 @@
     <ClCompile Include="src\EVPCipher.cpp" />
     <ClCompile Include="src\EVPCipherContext.cpp" />
     <ClCompile Include="src\EVPBuffer.cpp" />
-    <ClCompile Include="src\ECSecretContext.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -33,7 +32,6 @@
     <ClInclude Include="src\EVPCipher.h" />
     <ClInclude Include="src\EVPCipherContext.h" />
     <ClInclude Include="src\EVPBuffer.h" />
-    <ClInclude Include="src\ECSecretContext.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
